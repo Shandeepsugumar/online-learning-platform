@@ -1,19 +1,27 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Clone Repository') {
             steps {
-                echo 'Building...'
+                git 'https://github.com/your-repo/sample-app.git'
             }
         }
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Testing...'
+                sh 'docker build -t your-dockerhub-username/sample-app .'
             }
         }
-        stage('Deploy') {
+        stage('Push to Docker Hub') {
             steps {
-                echo 'Deploying...'
+                withDockerRegistry([credentialsId: 'docker-hub', url: '']) {
+                    sh 'docker push your-dockerhub-username/sample-app'
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
             }
         }
     }
