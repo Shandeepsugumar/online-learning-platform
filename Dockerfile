@@ -1,17 +1,18 @@
-FROM node:18
+# Use Node.js as the base image
+FROM node:20
 
+# Set the working directory
 WORKDIR /app
 
+# Copy package files and install dependencies
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm install --omit=dev
-
-# Remove existing bcrypt and reinstall inside Docker
-RUN npm rebuild bcrypt --build-from-source
-
+# Copy the rest of the application code
 COPY . .
 
-EXPOSE 4000
+# Expose the port the app runs on
+EXPOSE 3000
 
+# Start the app
 CMD ["node", "server.js"]
