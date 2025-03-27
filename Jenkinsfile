@@ -8,7 +8,7 @@ pipeline {
         PROMETHEUS_DEPLOYMENT = "k8s/prometheus-deployment.yaml"
         PROMETHEUS_CONFIG = "k8s/prometheus-configmap.yaml"
         GRAFANA_DEPLOYMENT = "k8s/grafana-deployment.yaml"
-        KUBECONFIG = "/home/shandeep/.kube/config"
+        KUBECONFIG_PATH = "/home/shandeep/.kube/config"
         WORK_DIR = "${WORKSPACE}"
     }
 
@@ -34,42 +34,11 @@ pipeline {
             }
         }
 
-        stage('Create YAML Files') {
-            steps {
-                script {
-                    echo '📝 Creating necessary YAML files...'
-                    sh '''
-                    mkdir -p k8s
-                    cat <<EOF > k8s/deployment.yaml
-                    apiVersion: apps/v1
-                    kind: Deployment
-                    metadata:
-                      name: my-app
-                    spec:
-                      replicas: 1
-                      selector:
-                        matchLabels:
-                          app: my-app
-                      template:
-                        metadata:
-                          labels:
-                            app: my-app
-                        spec:
-                          containers:
-                          - name: my-app
-                            image: ${DOCKER_IMAGE}
-                    EOF
-                    '''
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
                     echo "🐳 Building Docker Image: ${DOCKER_IMAGE}"
                     sh '''
-                        cd ${WORK_DIR}
                         echo "🔨 Starting Docker Build..."
                         docker build -t "$DOCKER_IMAGE" .
                     '''
@@ -82,27 +51,41 @@ pipeline {
                 script {
                     echo "📤 Pushing Docker Image to Docker Hub..."
                     withCredentials([string(credentialsId: 'docker-hub-credential', variable: 'DOCKER_HUB_TOKEN')]) {
-                        sh """
+                        sh '''
                             echo "🔐 Logging in to Docker Hub..."
-                            echo "\$DOCKER_HUB_TOKEN" | docker login -u "shandeep04" --password-stdin
+                            echo "$DOCKER_HUB_TOKEN" | docker login -u "shandeep04" --password-stdin
                             echo "🚀 Pushing Docker Image: ${DOCKER_IMAGE}..."
                             docker push ${DOCKER_IMAGE}
                             echo "✅ Docker Image Push Successful!"
-                        """
+                        '''
                     }
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Start Minikube & Deploy App') {
             steps {
                 script {
-                    echo "🚀 Starting Minikube and Deploying Application..."
+                    echo "🚀 Fixing Minikube Permissions & Deploying Application..."
                     sh '''
+                        set -e
+                        echo "🔧 Resetting Minikube Permissions..."
                         sudo sysctl fs.protected_regular=0
-                        minikube start --driver=docker
-                        kubectl apply -f k8s/doctor-app-deployment.yaml
-                        kubectl apply -f k8s/doctor-app-service.yaml
+                        sudo chown -R $USER:$USER /tmp/juju-* || true
+                        sudo chmod -R 777 /tmp/juju-* || true
+                        sudo chown -R $USER:$USER /home/shandeep/.minikube || true
+                        sudo chmod -R 777 /home/shandeep/.minikube || true
+
+                        echo "🧹 Cleaning old Minikube setup..."
+                        minikube delete || true
+
+                        echo "🔄 Starting Minikube..."
+                        sudo -E minikube start --driver=docker --force
+
+                        echo "📦 Deploying to Kubernetes..."
+                        export KUBECONFIG=${KUBECONFIG_PATH}
+                        kubectl apply -f ${K8S_DEPLOYMENT}
+                        kubectl apply -f ${K8S_SERVICE}
                         echo "🔍 Checking Pods Status..."
                         kubectl get pods
                     '''
@@ -116,11 +99,11 @@ pipeline {
                     echo "📊 Deploying Prometheus and Grafana..."
                     sh '''
                         echo "📌 Applying Prometheus Config..."
-                        kubectl apply -f k8s/prometheus-configmap.yaml
+                        kubectl apply -f ${PROMETHEUS_CONFIG}
                         echo "📌 Applying Prometheus Deployment..."
-                        kubectl apply -f k8s/prometheus-deployment.yaml
+                        kubectl apply -f ${PROMETHEUS_DEPLOYMENT}
                         echo "📌 Applying Grafana Deployment..."
-                        kubectl apply -f k8s/grafana-deployment.yaml
+                        kubectl apply -f ${GRAFANA_DEPLOYMENT}
                     '''
                 }
             }
