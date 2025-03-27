@@ -74,7 +74,7 @@ pipeline {
     steps {
         script {
             echo "🔹 Starting Docker Image Push to Docker Hub..."
-            withCredentials([string(credentialsId: 'DOCKER_HUB_TOKEN', variable: 'DOCKER_HUB_TOKEN')]) {
+            withCredentials([string(credentialsId: 'docker-hub-credential', variable: 'DOCKER_HUB_TOKEN')]) {
                 sh """
                     echo "🔐 Logging in to Docker Hub..."
                     echo "\$DOCKER_HUB_TOKEN" | docker login -u "shandeep04" -p "shandeep-4621"
