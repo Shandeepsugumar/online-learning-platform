@@ -21,7 +21,7 @@ spec:
             - containerPort: 4000
           env:
             - name: MONGO_URI
-              value: "mongodb+srv://dbEsteemJK:qwerty786!A@esteem-jk.wwqurhe.mongodb.net/?retryWrites=true&w=majority&appName=Esteem-JK"
+              value: "mongodb://localhost:27017/coderone"
           resources:
             limits:
               memory: "512Mi"
