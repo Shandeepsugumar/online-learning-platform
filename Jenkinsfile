@@ -37,20 +37,28 @@ pipeline {
         stage('Create YAML Files') {
             steps {
                 script {
-                    echo "📝 Creating necessary YAML files..."
+                    echo '📝 Creating necessary YAML files...'
                     sh '''
-                        mkdir -p k8s
-                        cat <<EOF > k8s/prometheus-configmap.yaml
-                        apiVersion: v1
-                        kind: ConfigMap
+                    mkdir -p k8s
+                    cat <<EOF > k8s/deployment.yaml
+                    apiVersion: apps/v1
+                    kind: Deployment
+                    metadata:
+                      name: my-app
+                    spec:
+                      replicas: 1
+                      selector:
+                        matchLabels:
+                          app: my-app
+                      template:
                         metadata:
-                          name: prometheus-config
-                          namespace: monitoring
-                        data:
-                          prometheus.yml: |
-                            global:
-                              scrape_interval: 15s
-                        EOF
+                          labels:
+                            app: my-app
+                        spec:
+                          containers:
+                          - name: my-app
+                            image: ${DOCKER_IMAGE}
+                    EOF
                     '''
                 }
             }
@@ -91,6 +99,7 @@ pipeline {
                 script {
                     echo "🚀 Starting Minikube and Deploying Application..."
                     sh '''
+                        sudo sysctl fs.protected_regular=0
                         minikube start --driver=docker
                         kubectl apply -f k8s/doctor-app-deployment.yaml
                         kubectl apply -f k8s/doctor-app-service.yaml
