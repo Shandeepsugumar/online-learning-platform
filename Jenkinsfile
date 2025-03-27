@@ -63,7 +63,7 @@ pipeline {
             }
         }
 
-        stage('Start Minikube & Deploy App') {
+stage('Start Minikube & Deploy App') {
     steps {
         script {
             echo "🚀 Fixing Minikube Permissions & Deploying Application..."
@@ -71,11 +71,11 @@ pipeline {
                 set -e
                 echo "🔧 Setting Up Minikube Environment..."
                 
-                export MINIKUBE_HOME=$HOME/.minikube
-                export KUBECONFIG=$HOME/.kube/config
+                export MINIKUBE_HOME=/var/lib/jenkins/.minikube
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
 
                 echo "🔧 Fixing Minikube Profile Directory Permissions..."
-                sudo chown -R $USER:$USER $MINIKUBE_HOME || true
+                sudo chown -R jenkins:jenkins $MINIKUBE_HOME || true
                 sudo chmod -R 777 $MINIKUBE_HOME || true
 
                 echo "🧹 Cleaning old Minikube setup..."
@@ -83,6 +83,10 @@ pipeline {
 
                 echo "🔄 Starting Minikube as Non-Root User..."
                 minikube start --driver=docker --force
+
+                echo "🔧 Fixing Kube Config Permissions..."
+                sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
+                sudo chmod -R 777 /var/lib/jenkins/.kube
 
                 echo "📦 Deploying to Kubernetes..."
                 kubectl apply -f ${K8S_DEPLOYMENT}
@@ -96,21 +100,25 @@ pipeline {
 
 
 
-        stage('Deploy Monitoring Stack') {
-            steps {
-                script {
-                    echo "📊 Deploying Prometheus and Grafana..."
-                    sh '''
-                        echo "📌 Applying Prometheus Config..."
-                        kubectl apply -f ${PROMETHEUS_CONFIG}
-                        echo "📌 Applying Prometheus Deployment..."
-                        kubectl apply -f ${PROMETHEUS_DEPLOYMENT}
-                        echo "📌 Applying Grafana Deployment..."
-                        kubectl apply -f ${GRAFANA_DEPLOYMENT}
-                    '''
-                }
-            }
+
+stage('Deploy Monitoring Stack') {
+    steps {
+        script {
+            echo "📊 Deploying Prometheus and Grafana..."
+            sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                
+                echo "📌 Applying Prometheus Config..."
+                kubectl apply -f ${PROMETHEUS_CONFIG}
+                echo "📌 Applying Prometheus Deployment..."
+                kubectl apply -f ${PROMETHEUS_DEPLOYMENT}
+                echo "📌 Applying Grafana Deployment..."
+                kubectl apply -f ${GRAFANA_DEPLOYMENT}
+            '''
         }
+    }
+}
+
 
         stage('Verify Deployment') {
             steps {
