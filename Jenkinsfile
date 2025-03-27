@@ -48,20 +48,27 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-            steps {
-                script {
-                    echo "Pushing Docker Image to Docker Hub..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh '''
-                            echo "Logging in to Docker Hub..."
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                            echo "Pushing Image: $DOCKER_IMAGE"
-                            docker push "$DOCKER_IMAGE"
-                        '''
-                    }
-                }
-            }
+    steps {
+        script {
+            echo "🔹 Starting Docker Image Push to Docker Hub..."
+
+            def dockerUser = "shandeep04"
+            def dockerPass = "shandeep-4621"
+            def dockerImage = "shandeep04/docker_jenkins_task2:latest"
+
+            sh """
+                echo "🔐 Logging in to Docker Hub..."
+                echo '${dockerPass}' | docker login -u '${dockerUser}' --password-stdin
+
+                echo "📤 Pushing Docker Image: ${dockerImage}..."
+                docker push ${dockerImage}
+
+                echo "✅ Docker Image Push Successful!"
+            """
         }
+    }
+}
+
 
         stage('Verify YAML Files') {
             steps {
