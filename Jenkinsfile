@@ -15,14 +15,14 @@ pipeline {
     stages {
         stage('Cleanup Workspace') {
             steps {
-                echo "Cleaning workspace..."
+                echo "🧹 Cleaning workspace..."
                 cleanWs()
             }
         }
 
         stage('Clone Repository') {
             steps {
-                echo "Cloning repository..."
+                echo "📥 Cloning repository..."
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: 'main']],
@@ -37,10 +37,9 @@ pipeline {
         stage('Create YAML Files') {
             steps {
                 script {
-                    echo "Creating necessary YAML files..."
+                    echo "📝 Creating necessary YAML files..."
                     sh '''
                         mkdir -p k8s
-
                         cat <<EOF > k8s/prometheus-configmap.yaml
                         apiVersion: v1
                         kind: ConfigMap
@@ -60,44 +59,43 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "Building Docker Image: ${DOCKER_IMAGE}"
+                    echo "🐳 Building Docker Image: ${DOCKER_IMAGE}"
                     sh '''
                         cd ${WORK_DIR}
-                        echo "Starting Docker Build..."
+                        echo "🔨 Starting Docker Build..."
                         docker build -t "$DOCKER_IMAGE" .
                     '''
                 }
             }
         }
 
-       stage('Push Docker Image') {
-    steps {
-        script {
-            echo "🔹 Starting Docker Image Push to Docker Hub..."
-            withCredentials([string(credentialsId: 'docker-hub-credential', variable: 'DOCKER_HUB_TOKEN')]) {
-                sh """
-                    echo "🔐 Logging in to Docker Hub..."
-                    echo "\$DOCKER_HUB_TOKEN" | docker login -u "shandeep04" -p "shandeep-4621"
-                    echo "📤 Pushing Docker Image: ${DOCKER_IMAGE}..."
-                    docker push ${DOCKER_IMAGE}
-                    echo "✅ Docker Image Push Successful!"
-                """
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    echo "📤 Pushing Docker Image to Docker Hub..."
+                    withCredentials([string(credentialsId: 'docker-hub-credential', variable: 'DOCKER_HUB_TOKEN')]) {
+                        sh """
+                            echo "🔐 Logging in to Docker Hub..."
+                            echo "\$DOCKER_HUB_TOKEN" | docker login -u "shandeep04" --password-stdin
+                            echo "🚀 Pushing Docker Image: ${DOCKER_IMAGE}..."
+                            docker push ${DOCKER_IMAGE}
+                            echo "✅ Docker Image Push Successful!"
+                        """
+                    }
+                }
             }
         }
-    }
-}
-
-
 
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    echo "🚀 Deploying Application to Kubernetes..."
+                    echo "🚀 Starting Minikube and Deploying Application..."
                     sh '''
-                        sudo minikube start
-                        sudo -u shandeep kubectl apply -f k8s/doctor-app-deployment.yaml
-                        sudo -u shandeep kubectl apply -f k8s/doctor-app-service.yaml
-                        sudo -u shandeep kubectl get pods
+                        minikube start --driver=docker
+                        kubectl apply -f k8s/doctor-app-deployment.yaml
+                        kubectl apply -f k8s/doctor-app-service.yaml
+                        echo "🔍 Checking Pods Status..."
+                        kubectl get pods
                     '''
                 }
             }
@@ -106,14 +104,14 @@ pipeline {
         stage('Deploy Monitoring Stack') {
             steps {
                 script {
-                    echo "Deploying Prometheus and Grafana..."
+                    echo "📊 Deploying Prometheus and Grafana..."
                     sh '''
-                        echo "Applying Prometheus Config..."
-                        sudo -u shandeep kubectl apply -f k8s/prometheus-configmap.yaml
-                        echo "Applying Prometheus Deployment..."
-                        sudo -u shandeep kubectl apply -f k8s/prometheus-deployment.yaml
-                        echo "Applying Grafana Deployment..."
-                        sudo -u shandeep kubectl apply -f k8s/grafana-deployment.yaml
+                        echo "📌 Applying Prometheus Config..."
+                        kubectl apply -f k8s/prometheus-configmap.yaml
+                        echo "📌 Applying Prometheus Deployment..."
+                        kubectl apply -f k8s/prometheus-deployment.yaml
+                        echo "📌 Applying Grafana Deployment..."
+                        kubectl apply -f k8s/grafana-deployment.yaml
                     '''
                 }
             }
@@ -122,12 +120,12 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 script {
-                    echo "Verifying Kubernetes Deployment..."
+                    echo "✅ Verifying Kubernetes Deployment..."
                     sh '''
-                        echo "Listing Pods..."
-                        sudo -u shandeep kubectl get pods
-                        echo "Listing Services..."
-                        sudo -u shandeep kubectl get svc
+                        echo "🔍 Listing Pods..."
+                        kubectl get pods
+                        echo "🔍 Listing Services..."
+                        kubectl get svc
                     '''
                 }
             }
@@ -136,10 +134,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment Successful!"
+            echo "🎉 Deployment Successful!"
         }
         failure {
-            echo "❌ Deployment Failed!"
+            echo "❌ Deployment Failed! Check logs for details."
         }
     }
 }
