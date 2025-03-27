@@ -69,20 +69,22 @@ pipeline {
             echo "🚀 Fixing Minikube Permissions & Deploying Application..."
             sh '''
                 set -e
-                echo "🔧 Fixing Minikube File Permissions..."
-                sudo chown -R $USER:$USER /tmp/juju-* || true
-                sudo chmod -R 777 /tmp/juju-* || true
-                sudo chown -R $USER:$USER /home/shandeep/.minikube || true
-                sudo chmod -R 777 /home/shandeep/.minikube || true
+                echo "🔧 Setting Up Minikube Environment..."
+                
+                export MINIKUBE_HOME=$HOME/.minikube
+                export KUBECONFIG=$HOME/.kube/config
+
+                echo "🔧 Fixing Minikube Profile Directory Permissions..."
+                sudo chown -R $USER:$USER $MINIKUBE_HOME || true
+                sudo chmod -R 777 $MINIKUBE_HOME || true
 
                 echo "🧹 Cleaning old Minikube setup..."
                 minikube delete || true
 
                 echo "🔄 Starting Minikube as Non-Root User..."
-                minikube start --driver=docker
+                minikube start --driver=docker --force
 
                 echo "📦 Deploying to Kubernetes..."
-                export KUBECONFIG=${KUBECONFIG_PATH}
                 kubectl apply -f ${K8S_DEPLOYMENT}
                 kubectl apply -f ${K8S_SERVICE}
                 echo "🔍 Checking Pods Status..."
@@ -91,6 +93,7 @@ pipeline {
         }
     }
 }
+
 
 
         stage('Deploy Monitoring Stack') {
