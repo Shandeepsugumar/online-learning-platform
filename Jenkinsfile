@@ -64,34 +64,34 @@ pipeline {
         }
 
         stage('Start Minikube & Deploy App') {
-            steps {
-                script {
-                    echo "🚀 Fixing Minikube Permissions & Deploying Application..."
-                    sh '''
-                        set -e
-                        echo "🔧 Resetting Minikube Permissions..."
-                        sudo sysctl fs.protected_regular=0
-                        sudo chown -R $USER:$USER /tmp/juju-* || true
-                        sudo chmod -R 777 /tmp/juju-* || true
-                        sudo chown -R $USER:$USER /home/shandeep/.minikube || true
-                        sudo chmod -R 777 /home/shandeep/.minikube || true
+    steps {
+        script {
+            echo "🚀 Fixing Minikube Permissions & Deploying Application..."
+            sh '''
+                set -e
+                echo "🔧 Fixing Minikube File Permissions..."
+                sudo chown -R $USER:$USER /tmp/juju-* || true
+                sudo chmod -R 777 /tmp/juju-* || true
+                sudo chown -R $USER:$USER /home/shandeep/.minikube || true
+                sudo chmod -R 777 /home/shandeep/.minikube || true
 
-                        echo "🧹 Cleaning old Minikube setup..."
-                        minikube delete || true
+                echo "🧹 Cleaning old Minikube setup..."
+                minikube delete || true
 
-                        echo "🔄 Starting Minikube..."
-                        sudo -E minikube start --driver=docker --force
+                echo "🔄 Starting Minikube as Non-Root User..."
+                minikube start --driver=docker
 
-                        echo "📦 Deploying to Kubernetes..."
-                        export KUBECONFIG=${KUBECONFIG_PATH}
-                        kubectl apply -f ${K8S_DEPLOYMENT}
-                        kubectl apply -f ${K8S_SERVICE}
-                        echo "🔍 Checking Pods Status..."
-                        kubectl get pods
-                    '''
-                }
-            }
+                echo "📦 Deploying to Kubernetes..."
+                export KUBECONFIG=${KUBECONFIG_PATH}
+                kubectl apply -f ${K8S_DEPLOYMENT}
+                kubectl apply -f ${K8S_SERVICE}
+                echo "🔍 Checking Pods Status..."
+                kubectl get pods
+            '''
         }
+    }
+}
+
 
         stage('Deploy Monitoring Stack') {
             steps {
