@@ -119,8 +119,6 @@ stage('Deploy Monitoring Stack') {
     }
 }
 
-
-         stages {
         stage('Verify Deployment') {
             steps {
                 script {
@@ -128,7 +126,6 @@ stage('Deploy Monitoring Stack') {
                 }
             }
         }
-    }
         
 
     post {
