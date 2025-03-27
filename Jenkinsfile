@@ -76,7 +76,7 @@ pipeline {
             echo "🔹 Starting Docker Image Push to Docker Hub..."
             sh """
                 echo "🔐 Logging in to Docker Hub..."
-                echo '${DOCKER_HUB_TOKEN}' | docker login -u 'shandeep04' --password-stdin
+                echo '${DOCKER_HUB_TOKEN}' | docker login -u "shandeep04" -p "shandeep-4621"
                 echo "📤 Pushing Docker Image: ${DOCKER_IMAGE}..."
                 docker push ${DOCKER_IMAGE}
                 echo "✅ Docker Image Push Successful!"
