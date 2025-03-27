@@ -71,21 +71,20 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-            steps {
-                script {
-                    echo "🔹 Starting Docker Image Push to Docker Hub..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh """
-                            echo "🔐 Logging in to Docker Hub..."
-                            echo '${DOCKER_PASS}' | docker login -u '${DOCKER_USER}' --password-stdin
-                            echo "📤 Pushing Docker Image: ${DOCKER_IMAGE}..."
-                            docker push ${DOCKER_IMAGE}
-                            echo "✅ Docker Image Push Successful!"
-                        """
-                    }
-                }
-            }
+    steps {
+        script {
+            echo "🔹 Starting Docker Image Push to Docker Hub..."
+            sh """
+                echo "🔐 Logging in to Docker Hub..."
+                echo '${DOCKER_HUB_TOKEN}' | docker login -u 'shandeep04' --password-stdin
+                echo "📤 Pushing Docker Image: ${DOCKER_IMAGE}..."
+                docker push ${DOCKER_IMAGE}
+                echo "✅ Docker Image Push Successful!"
+            """
         }
+    }
+}
+
 
         stage('Deploy to Kubernetes') {
             steps {
