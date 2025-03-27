@@ -8,7 +8,7 @@ pipeline {
         PROMETHEUS_DEPLOYMENT = "k8s/prometheus-deployment.yaml"
         PROMETHEUS_CONFIG = "k8s/prometheus-configmap.yaml"
         GRAFANA_DEPLOYMENT = "k8s/grafana-deployment.yaml"
-        KUBECONFIG_PATH = "/home/shandeep/.kube/config"
+        KUBECONFIG = "/home/shandeep/.kube/config"
         WORK_DIR = "${WORKSPACE}"
     }
 
@@ -120,20 +120,16 @@ stage('Deploy Monitoring Stack') {
 }
 
 
+         stages {
         stage('Verify Deployment') {
             steps {
                 script {
-                    echo "✅ Verifying Kubernetes Deployment..."
-                    sh '''
-                        echo "🔍 Listing Pods..."
-                        kubectl get pods
-                        echo "🔍 Listing Services..."
-                        kubectl get svc
-                    '''
+                    sh 'kubectl get pods'
                 }
             }
         }
     }
+        
 
     post {
         success {
