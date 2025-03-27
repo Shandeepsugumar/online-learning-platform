@@ -3,13 +3,13 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "shandeep04/docker_jenkins_task2:latest"
-        WORK_DIR = "Responsive-animated-login-signup-form"
-        K8S_DEPLOYMENT = "${WORK_DIR}/k8s/doctor-app-deployment.yaml"
-        K8S_SERVICE = "${WORK_DIR}/k8s/doctor-app-service.yaml"
-        PROMETHEUS_DEPLOYMENT = "${WORK_DIR}/k8s/prometheus-deployment.yaml"
-        PROMETHEUS_CONFIG = "${WORK_DIR}/k8s/prometheus-configmap.yaml"
-        GRAFANA_DEPLOYMENT = "${WORK_DIR}/k8s/grafana-deployment.yaml"
+        K8S_DEPLOYMENT = "k8s/doctor-app-deployment.yaml"
+        K8S_SERVICE = "k8s/doctor-app-service.yaml"
+        PROMETHEUS_DEPLOYMENT = "k8s/prometheus-deployment.yaml"
+        PROMETHEUS_CONFIG = "k8s/prometheus-configmap.yaml"
+        GRAFANA_DEPLOYMENT = "k8s/grafana-deployment.yaml"
         KUBECONFIG = "/home/shandeep/.kube/config"  // Updated for Linux
+        WORK_DIR = "${WORKSPACE}" // Ensure the correct workspace directory
     }
 
     stages {
@@ -37,13 +37,12 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dir(WORK_DIR) {
-                        echo "Building Docker Image: ${DOCKER_IMAGE}"
-                        sh '''
-                            echo "Starting Docker Build..."
-                            docker build -t "$DOCKER_IMAGE" .
-                        '''
-                    }
+                    echo "Building Docker Image: ${DOCKER_IMAGE}"
+                    sh '''
+                        cd ${WORK_DIR}  // Ensure the correct directory
+                        echo "Starting Docker Build..."
+                        docker build -t "$DOCKER_IMAGE" .
+                    '''
                 }
             }
         }
