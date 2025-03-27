@@ -94,6 +94,7 @@ pipeline {
                 script {
                     echo "🚀 Deploying Application to Kubernetes..."
                     sh '''
+                        sudo minikube start
                         sudo -u shandeep kubectl apply -f k8s/doctor-app-deployment.yaml
                         sudo -u shandeep kubectl apply -f k8s/doctor-app-service.yaml
                         sudo -u shandeep kubectl get pods
