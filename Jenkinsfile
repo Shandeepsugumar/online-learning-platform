@@ -27,7 +27,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: 'main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/Athik01/task06.git',
+                        url: 'https://github.com/Shandeepsugumar/online-learning-platform.git',
                         credentialsId: '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'
                     ]]
                 ])
