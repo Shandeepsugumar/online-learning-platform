@@ -120,12 +120,17 @@ stage('Deploy Monitoring Stack') {
 }
 
         stage('Verify Deployment') {
-            steps {
-                script {
-                    sh 'kubectl get pods'
-                }
-            }
+    steps {
+        script {
+            echo "✅ Verifying Kubernetes Deployment..."
+            sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                echo "🔍 Listing Pods..."
+                kubectl get pods
+            '''
         }
+    }
+}
         
 
     post {
