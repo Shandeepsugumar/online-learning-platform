@@ -93,16 +93,17 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    echo "Deploying Doctor-App to Kubernetes..."
-                    sh '''
-                        kubectl apply -f "$K8S_DEPLOYMENT" --validate=false
-                        kubectl apply -f "$K8S_SERVICE" --validate=false
-                    '''
-                }
-            }
+    steps {
+        script {
+            echo "🚀 Deploying to Kubernetes..."
+            sh """
+                sudo -u shandeep kubectl apply -f deployment.yaml
+                sudo -u shandeep kubectl get pods
+            """
         }
+    }
+}
+
 
         stage('Deploy Monitoring Stack') {
             steps {
