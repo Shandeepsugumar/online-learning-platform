@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: doctor-app-service
+  name: learning-app-service
 spec:
   selector:
-    app: doctor-app
+    app: learning-app
   ports:
     - protocol: TCP
       port: 4000
