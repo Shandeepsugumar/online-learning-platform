@@ -21,7 +21,7 @@ spec:
             - containerPort: 4000
           env:
             - name: MONGO_URI
-              value: "mongodb://localhost:27017/coderone"
+              value: "mongodb+srv://shandeep4621:shandeep4621@cluster0.dpijowj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
           resources:
             limits:
               memory: "512Mi"
