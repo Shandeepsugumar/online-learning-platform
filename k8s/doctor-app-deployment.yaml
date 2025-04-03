@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: doctor-app
+  name: learning-app
   labels:
-    app: doctor-app
+    app: learning-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: doctor-app
+      app: learning-app
   template:
     metadata:
       labels:
-        app: doctor-app
+        app: learning-app
     spec:
       containers:
-        - name: doctor-app
+        - name: learning-app
           image: shandeep04/docker_jenkins_task2:latest
           ports:
             - containerPort: 4000
