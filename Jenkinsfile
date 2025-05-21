@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
         IMAGE_NAME = "shandeep04/online-learning-platform"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         KUBE_DEPLOYMENT = "online-learning-deployment"
