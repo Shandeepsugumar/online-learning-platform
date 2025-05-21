@@ -42,8 +42,8 @@ pipeline {
             steps {
                 script {
                     sh 'minikube delete'
-                    sh 'minikube start'
-                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'minikube start --driver=docker'
+                    sh 'kubectl apply --validate=false -f deployment.yaml'
                 }
             }
         }
