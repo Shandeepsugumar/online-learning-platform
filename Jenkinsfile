@@ -6,7 +6,7 @@ pipeline {
         DOCKER_TAG = 'latest'
     }
 
-    stages {
+   
         
 
         stage('Push Docker Image') {
