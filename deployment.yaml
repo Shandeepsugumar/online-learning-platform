@@ -13,8 +13,8 @@ spec:
         app: online-learning-platform
     spec:
       containers:
-      - name: platform
-        image: online-learning-platform:latest
+      - name: online-learning-platform
+        image: shandeep04/online-learning-platform:latest  # or use the tag from Jenkins
         ports:
         - containerPort: 80
 ---
