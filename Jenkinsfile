@@ -24,7 +24,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Add your test commands here, e.g., npm test
+                    echo 'No automated tests configured yet. Skipping…'
                 }
             }
         }
