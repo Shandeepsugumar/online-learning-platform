@@ -41,8 +41,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh 'minikube delete'
-                    sh 'minikube start --driver=docker'
+                    
                     sh 'kubectl apply --validate=false -f deployment.yaml'
                 }
             }
