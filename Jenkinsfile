@@ -15,20 +15,20 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    def dockerUsername = 'shandeep04'
-                    def dockerPassword = 'Shandeep-4621'
+        // stage('Push Docker Image') {
+        //     steps {
+        //         script {
+        //             def dockerUsername = 'shandeep04'
+        //             def dockerPassword = 'Shandeep-4621'
 
-                    sh """
-                        echo "${dockerPassword}" | docker login -u "${dockerUsername}" --password-stdin
-                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-                        docker logout
-                    """
-                }
-            }
-        }
+        //             sh """
+        //                 echo "${dockerPassword}" | docker login -u "${dockerUsername}" --password-stdin
+        //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+        //                 docker logout
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('Run Tests') {
             steps {
@@ -41,7 +41,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    
+                    kubectl get pods -A
                     sh 'kubectl apply --validate=false -f deployment.yaml'
                 }
             }
