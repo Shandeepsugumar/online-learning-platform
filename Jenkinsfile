@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/Shandeepsugumar/online-learning-platform.git'
+               git branch: 'main', url: 'https://github.com/Shandeepsugumar/online-learning-platform.git'
             }
         }
 
