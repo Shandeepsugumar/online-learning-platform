@@ -5,7 +5,7 @@ pipeline {
         KUBECONFIG = '/var/lib/jenkins/.kube/config'
         IMAGE_NAME = "shandeep04/online-learning-platform"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        KUBE_DEPLOYMENT = "online-learning-deployment"
+        KUBE_DEPLOYMENT = "online-learning-platform"
         KUBE_NAMESPACE = "default"
         DOCKER_USER = "shandeep04"
         DOCKER_PASS = "Shandeep-4621"
