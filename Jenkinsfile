@@ -31,7 +31,7 @@ pipeline {
 
         stage('Update K8s YAML') {
             steps {
-                sh "sed -i 's|__IMAGE_NAME__|${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml"
+                sh "sed -i \"s|IMAGE_NAME|${IMAGE_NAME}:${IMAGE_TAG}|g\" deployment.yaml"
             }
         }
 
