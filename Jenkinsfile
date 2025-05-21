@@ -24,6 +24,12 @@ pipeline {
                 }
             }
         }
+       stage('Check K8s Context') {
+            steps {
+                sh 'kubectl config get-contexts'
+                sh 'kubectl get nodes'
+            }
+       }
 
         stage('Push to DockerHub') {
             steps {
