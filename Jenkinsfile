@@ -63,19 +63,18 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-    steps {
-        script {
-            sh """
-                kubectl apply -f deployment.yaml -n ${KUBE_NAMESPACE}
-                kubectl set image deployment/${KUBE_DEPLOYMENT} \
-                platform=${IMAGE_NAME}:${IMAGE_TAG} \
-                -n ${KUBE_NAMESPACE}
-                kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
-            """
-        }
-    }
-}
-
+           steps {
+               script {
+                   sh """
+                       kubectl apply -f deployment.yaml -n ${KUBE_NAMESPACE}
+                       kubectl set image deployment/${KUBE_DEPLOYMENT} \
+                       online-learning-platform=${IMAGE_NAME}:${IMAGE_TAG} \
+                       -n ${KUBE_NAMESPACE}
+                       kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
+                   """
+               }
+           }
+       }
     }
 
     post {
