@@ -7,11 +7,7 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/Shandeepsugumar/online-learning-platform.git'
-            }
-        }
+        
 
         stage('Build Docker Image') {
             steps {
