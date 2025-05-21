@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-               git branch: 'main', url: 'https://github.com/Shandeepsugumar/online-learning-platform.git'
+                git branch: 'main', url: 'https://github.com/Shandeepsugumar/online-learning-platform.git'
             }
         }
 
@@ -25,12 +25,30 @@ pipeline {
                 }
             }
         }
-       stage('Check K8s Context') {
+
+        stage('Start Minikube') {
+            steps {
+                script {
+                    sh '''
+                        echo "🧹 Cleaning up old Minikube..."
+                        minikube delete || true
+
+                        echo "🚀 Starting Minikube..."
+                        minikube start --driver=docker
+                        
+                        echo "🔧 Setting up kubeconfig..."
+                        minikube update-context
+                    '''
+                }
+            }
+        }
+
+        stage('Check K8s Context') {
             steps {
                 sh 'kubectl config get-contexts'
                 sh 'kubectl get nodes'
             }
-       }
+        }
 
         stage('Push to DockerHub') {
             steps {
@@ -45,19 +63,18 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-    steps {
-        script {
-            sh """
-                kubectl apply -f deployment.yaml -n ${KUBE_NAMESPACE}
-                kubectl set image deployment/${KUBE_DEPLOYMENT} \
-                ${KUBE_DEPLOYMENT}=${IMAGE_NAME}:${IMAGE_TAG} \
-                -n ${KUBE_NAMESPACE}
-                kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
-            """
+            steps {
+                script {
+                    sh """
+                        kubectl apply -f deployment.yaml -n ${KUBE_NAMESPACE}
+                        kubectl set image deployment/${KUBE_DEPLOYMENT} \
+                        ${KUBE_DEPLOYMENT}=${IMAGE_NAME}:${IMAGE_TAG} \
+                        -n ${KUBE_NAMESPACE}
+                        kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
+                    """
+                }
+            }
         }
-    }
-}
-
     }
 
     post {
@@ -66,6 +83,10 @@ pipeline {
         }
         failure {
             echo '❌ Deployment failed!'
+        }
+        always {
+            echo '🧹 Cleaning up Minikube after pipeline run...'
+            sh 'minikube delete || true'
         }
     }
 }
