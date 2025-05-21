@@ -84,9 +84,5 @@ pipeline {
         failure {
             echo '❌ Deployment failed!'
         }
-        always {
-            echo '🧹 Cleaning up Minikube after pipeline run...'
-            sh 'minikube delete || true'
-        }
     }
 }
