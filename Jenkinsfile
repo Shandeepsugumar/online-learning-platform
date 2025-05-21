@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'online-learning-platform'
+        DOCKER_IMAGE = 'shandeep04/online-learning-platform'
         DOCKER_TAG = 'latest'
     }
 
