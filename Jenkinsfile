@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     def dockerUsername = 'shandeep04'
-                    def dockerPassword = 'shandeep-4621'
+                    def dockerPassword = 'Shandeep-4621'
 
                     sh """
                         echo "${dockerPassword}" | docker login -u "${dockerUsername}" --password-stdin
