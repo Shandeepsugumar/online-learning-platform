@@ -6,24 +6,29 @@ pipeline {
         DOCKER_TAG = 'latest'
     }
 
-   
-        
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                }
+            }
+        }
 
         stage('Push Docker Image') {
-    steps {
-        script {
-            def dockerUsername = 'shandeep04'
-            def dockerPassword = 'shandeep-4621'
+            steps {
+                script {
+                    def dockerUsername = 'shandeep04'
+                    def dockerPassword = 'shandeep-4621'
 
-            sh """
-                echo "${dockerPassword}" | docker login -u "${dockerUsername}" --password-stdin
-                docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-                docker logout
-            """
+                    sh """
+                        echo "${dockerPassword}" | docker login -u "${dockerUsername}" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker logout
+                    """
+                }
+            }
         }
-    }
-}
-
 
         stage('Run Tests') {
             steps {
@@ -33,20 +38,9 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('', 'dockerhub-credentials') {
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                    }
-                }
-            }
-        }
-
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Assuming kubectl is configured
                     sh 'kubectl apply -f deployment.yaml'
                 }
             }
