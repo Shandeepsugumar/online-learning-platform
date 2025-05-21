@@ -6,7 +6,8 @@ pipeline {
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         KUBE_DEPLOYMENT = "online-learning-deployment"
         KUBE_NAMESPACE = "default"
-        REGISTRY_CREDENTIALS = 'dockerhub-creds' // Jenkins credentials ID
+        DOCKER_USER = "shandeep04"
+        DOCKER_PASS = "Shandeep-4621"
     }
 
     stages {
@@ -24,12 +25,14 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Registry') {
+        stage('Push to DockerHub') {
             steps {
-                withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}", url: '') {
-                    script {
-                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
-                    }
+                script {
+                    sh """
+                        echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        docker logout
+                    """
                 }
             }
         }
@@ -37,16 +40,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Update image in Kubernetes deployment
                     sh """
-                    kubectl set image deployment/${KUBE_DEPLOYMENT} \
-                    ${KUBE_DEPLOYMENT}=${IMAGE_NAME}:${IMAGE_TAG} \
-                    -n ${KUBE_NAMESPACE}
-                    """
+                        kubectl set image deployment/${KUBE_DEPLOYMENT} \
+                        ${KUBE_DEPLOYMENT}=${IMAGE_NAME}:${IMAGE_TAG} \
+                        -n ${KUBE_NAMESPACE}
 
-                    // Optional: Wait for rollout
-                    sh """
-                    kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
+                        kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
                     """
                 }
             }
@@ -55,10 +54,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment to Kubernetes was successful.'
+            echo '✅ Deployment to Kubernetes was successful.'
         }
         failure {
-            echo 'Deployment failed!'
+            echo '❌ Deployment failed!'
         }
     }
 }
