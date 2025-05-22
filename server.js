@@ -8,10 +8,8 @@ const PORT = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://localhost:27017/coderone', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGODB_URI || "mongodb://mongo:27017/mydb");
+
 
 const User = mongoose.model('User', new mongoose.Schema({
     username: String,
