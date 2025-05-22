@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -10,6 +11,16 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files (if you have a frontend in 'public' folder)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Root route - to avoid "Cannot GET /" error
+app.get('/', (req, res) => {
+  // You can serve a static HTML file or just a message
+  // res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.send('Welcome to the Online Learning API!');
+});
 
 // MongoDB Atlas URI with fallback and database name
 const mongoAtlasUri =
@@ -99,6 +110,7 @@ app.put('/api/user', async (req, res) => {
 
 // Logout
 app.post('/api/logout', (req, res) => {
+  // You can clear session or token here if implemented
   res.sendStatus(200);
 });
 
