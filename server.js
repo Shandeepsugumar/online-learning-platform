@@ -3,13 +3,17 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;  // Declare PORT only once here
+
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://mongo:27017/mydb");
-
+mongoose.connect(process.env.MONGODB_URI || "mongodb://mongo:27017/mydb", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 const User = mongoose.model('User', new mongoose.Schema({
     username: String,
@@ -56,8 +60,11 @@ app.post('/login', async (req, res) => {
 
 app.get('/api/user', async (req, res) => {
     try {
-      const newUser = await newUser.findOne({ username, email });
-      res.json(newUser);
+      // Example: fetch user by email or username (adjust as needed)
+      // Here, you need some query param or auth to identify user
+      // For demonstration, fetching first user
+      const user = await User.findOne({});
+      res.json(user);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch user information' });
     }
@@ -66,7 +73,8 @@ app.get('/api/user', async (req, res) => {
 app.put('/api/user', async (req, res) => {
     const { username, email } = req.body;
     try {
-      await newUser.updateOne({}, { username, email });
+      // Update user info: this updates the first user document - adjust logic as needed
+      await User.updateOne({}, { username, email });
       res.sendStatus(200);
     } catch (error) {
       res.status(500).json({ error: 'Failed to update user information' });
@@ -77,9 +85,6 @@ app.post('/api/logout', (req, res) => {
   res.sendStatus(200);
 });
 
-const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
-
