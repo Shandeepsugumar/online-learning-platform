@@ -4,7 +4,7 @@ pipeline {
     environment {
         KUBECONFIG = '/var/lib/jenkins/.kube/config'
         IMAGE_NAME = "shandeep04/online-learning-platform"
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        IMAGE_TAG = "${env.BUILD_NUMBER}"   // Use build number for tag
         KUBE_DEPLOYMENT = "online-learning-platform"
         KUBE_NAMESPACE = "default"
         DOCKER_USER = "shandeep04"
@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
         }
@@ -35,7 +35,7 @@ pipeline {
 
                         echo "🚀 Starting Minikube..."
                         minikube start --driver=docker
-                        
+
                         echo "🔧 Setting up kubeconfig..."
                         minikube update-context
                     '''
@@ -53,6 +53,7 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 script {
+                    // Login and push docker image
                     sh """
                         echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                         docker push ${IMAGE_NAME}:${IMAGE_TAG}
@@ -63,18 +64,18 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-           steps {
-               script {
-                   sh """
-                       kubectl apply -f deployment.yaml -n ${KUBE_NAMESPACE}
-                       kubectl set image deployment/${KUBE_DEPLOYMENT} \
-                       online-learning-platform=${IMAGE_NAME}:${IMAGE_TAG} \
-                       -n ${KUBE_NAMESPACE}
-                       kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
-                   """
-               }
-           }
-       }
+            steps {
+                script {
+                    sh """
+                        kubectl apply -f deployment.yaml -n ${KUBE_NAMESPACE}
+                        kubectl set image deployment/${KUBE_DEPLOYMENT} \
+                        online-learning-platform=${IMAGE_NAME}:${IMAGE_TAG} \
+                        -n ${KUBE_NAMESPACE}
+                        kubectl rollout status deployment/${KUBE_DEPLOYMENT} -n ${KUBE_NAMESPACE}
+                    """
+                }
+            }
+        }
     }
 
     post {
