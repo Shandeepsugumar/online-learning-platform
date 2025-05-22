@@ -16,7 +16,7 @@ spec:
       - name: online-learning-platform
         image: shandeep04/online-learning-platform:latest  # or use the tag from Jenkins
         ports:
-        - containerPort: 80
+        - containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
@@ -29,4 +29,4 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 3000
