@@ -1,3 +1,57 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:5.0
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: mydb
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,9 +68,12 @@ spec:
     spec:
       containers:
       - name: online-learning-platform
-        image: shandeep04/online-learning-platform:latest  # or use the tag from Jenkins
+        image: shandeep04/online-learning-platform:latest
         ports:
         - containerPort: 3000
+        env:
+        - name: MONGODB_URI
+          value: mongodb://mongo:27017/mydb
 ---
 apiVersion: v1
 kind: Service
