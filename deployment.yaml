@@ -1,0 +1,179 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:5.0
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: mydb
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: online-learning-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: online-learning-platform
+  template:
+    metadata:
+      labels:
+        app: online-learning-platform
+    spec:
+      containers:
+      - name: online-learning-platform
+        image: shandeep04/online-learning-platform:latest
+        ports:
+        - containerPort: 5000        # Your app listens on 5000, not 3000
+        env:
+        - name: MONGODB_URI
+          # Replace <username>, <password>, <cluster-url>, <dbname> with your Atlas details:
+          value: "mongodb+srv://shandeep4621:shandeep4621@cluster0.dpijowj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: online-learning-platform-service
+spec:
+  type: ClusterIP
+  selector:
+    app: online-learning-platform
+  ports:
+  - protocol: TCP
+    port: 80               # Expose on port 80 internally
+    targetPort: 5000       # Forward to container port 5000
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:5.0
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: mydb
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: online-learning-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: online-learning-platform
+  template:
+    metadata:
+      labels:
+        app: online-learning-platform
+    spec:
+      containers:
+      - name: online-learning-platform
+        image: shandeep04/online-learning-platform:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGODB_URI
+          value: mongodb://mongo:27017/mydb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: online-learning-platform-service
+spec:
+  type: ClusterIP
+  selector:
+    app: online-learning-platform
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
