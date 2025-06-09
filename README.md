@@ -2,16 +2,16 @@
 This project is a full-stack online learning platform built using Bootstrap for the frontend, Node.js with Express.js for the backend, and MongoDB for data storage. It is designed to provide an intuitive and user-friendly experience for both learners and administrators.
 
  # For Learners:
-  > Register and log in securely
-  > Browse and enroll in available courses
-  > View course content and materials
-  > Track learning progress
-  > Responsive user interface for seamless experience on all devices
+  1) Register and log in securely
+  2) Browse and enroll in available courses
+  3) View course content and materials
+  4) Track learning progress
+  5) Responsive user interface for seamless experience on all devices
 
  # For Admins:
-  > Admin authentication and dashboard
-  > Add, update, and delete courses
-  > Manage user data and course enrollments
+  1) Admin authentication and dashboard
+  2) Add, update, and delete courses
+  3) Manage user data and course enrollments
 
 # Tech Stack:
   1) Frontend: HTML, CSS, JavaScript, Bootstrap
@@ -22,18 +22,18 @@ This project is a full-stack online learning platform built using Bootstrap for 
 
 # DevOps Integration:
 This project supports automated deployment with:
-  > Docker: Containerization of the application
-  > Jenkins: Automated build and test pipeline
-  > Kubernetes: Scalable deployment environment
+  1) Docker: Containerization of the application
+  2) Jenkins: Automated build and test pipeline
+  3) Kubernetes: Scalable deployment environment
 
 # Folder Structure:
-├── client/               # Frontend code
-├── server/               # Backend code (Express APIs)
-├── models/               # Mongoose schemas
-├── routes/               # API route handlers
-├── public/               # Static files
-├── Dockerfile            # Docker build configuration
-├── Jenkinsfile           # Jenkins pipeline script
+1) ├── client/               # Frontend code
+2) ├── server/               # Backend code (Express APIs)
+3) ├── models/               # Mongoose schemas
+4) ├── routes/               # API route handlers
+5) ├── public/               # Static files
+6) ├── Dockerfile            # Docker build configuration
+7) ├── Jenkinsfile           # Jenkins pipeline script
 
 # How to Run Locally:
   1) # Clone the repository:
