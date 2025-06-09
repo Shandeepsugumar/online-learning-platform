@@ -36,17 +36,18 @@ This project supports automated deployment with:
 7) ├── Jenkinsfile           # Jenkins pipeline script
 
 # How to Run Locally:
-  1) # Clone the repository:
-     1) git clone https://github.com/Shandeepsugumar/online-learning-platform.git
-     2) cd online-learning-platform
+  # 1) Clone the repository:
+    git clone https://github.com/Shandeepsugumar/online-learning-platform.git
+    cd online-learning-platform
     
-  2) # Install dependencies:
-       npm install
+  # 2) Install dependencies:
+    npm install
 
-  3) # Start MongoDB server (locally or use MongoDB Atlas)
-  4) # Run the server:
-       node server.js
-  5) # Open your browser at http://localhost:3000
+  # 3) Start MongoDB server (locally or use MongoDB Atlas)
+  # 4) Run the server:
+    node server.js
+  # 6) Open your browser at
+    http://localhost:3000
 
 # License
 This project is open-source and available under the MIT License.
